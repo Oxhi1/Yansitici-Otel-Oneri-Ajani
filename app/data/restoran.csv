@@ -1,0 +1,6 @@
+id,isim,sehir,mutfak_turu,fiyat_seviye,puan,otellere_yakin_ids,konum_aciklama
+1,Sahil Balıkçısı,Antalya,Deniz Ürünleri,3,4.6,"1,5","Sahilde, taze balık ve meze"
+2,Anadolu Sofrası,Antalya,Türk Mutfağı,2,4.4,"1,3","Ev yemekleri, aile ortamı"
+3,Merkez Steakhouse,İstanbul,Steakhouse,4,4.7,"2","İş yemekleri için uygun, kaliteli etler"
+4,Veggie Green,İzmir,Vegan,3,4.3,"4","Vejetaryen ve vegan ağırlıklı menü"
+5,Hızlı Lokanta,Muğla,Fast Food,1,3.9,"3","Hızlı servis, ekonomik menü"

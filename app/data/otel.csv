@@ -1,0 +1,6 @@
+id,isim,sehir,fiyat_gece,puan,mesafe_merkez_km,konum_aciklama
+1,Deniz Manzaralı Otel,Antalya,1200,4.5,1.2,"Denize yakın, sahile yürüme mesafesi"
+2,Merkez İş Oteli,İstanbul,1800,4.2,0.5,"Şehir merkezinde, iş seyahati için uygun"
+3,Aile Tatil Köyü,Muğla,900,4.0,3.5,"Çocuklu aileler için ideal, her şey dahil"
+4,Bütçe Dostu Pansiyon,İzmir,600,3.8,2.0,"Temel ihtiyaçlar için yeterli, ekonomik"
+5,Lüks Spa Otel,Antalya,2500,4.8,4.0,"Spa ve wellness odaklı lüks otel"
