@@ -34,8 +34,8 @@ def create_tables():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER,
             session_id INTEGER,
-            otel_id INTEGER,
-            restoran_id INTEGER,
+            otel_id TEXT,
+            restoran_id TEXT,
             rating INTEGER,
             comment TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

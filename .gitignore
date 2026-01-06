@@ -1,0 +1,18 @@
+# secrets
+.env
+.env.*
+*.env
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# local db
+app/db/app.db
+*.db
+
+# mac
+.DS_Store
+
