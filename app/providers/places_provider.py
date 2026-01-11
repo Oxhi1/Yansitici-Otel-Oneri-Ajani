@@ -1,7 +1,14 @@
+from dotenv import load_dotenv
+load_dotenv()  # .env dosyasını YÜKLER (en üstte olmalı)
+
 import os
 import requests
 from typing import List, Dict, Optional, Any
 
+
+# =========================
+# Config
+# =========================
 
 PLACES_KEY = os.getenv("PLACES_API_KEY", "").strip()
 
@@ -9,9 +16,16 @@ PLACES_TEXTSEARCH_URL = "https://maps.googleapis.com/maps/api/place/textsearch/j
 PLACES_NEARBY_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
 
 
+# =========================
+# Helpers
+# =========================
+
 def _require_key():
     if not PLACES_KEY:
-        raise RuntimeError("PLACES_API_KEY is not set")
+        raise RuntimeError(
+            "PLACES_API_KEY is not set. "
+            "Make sure .env exists and load_dotenv() is called."
+        )
 
 
 def _safe_get(d: Dict[str, Any], path: List[str], default=None):
@@ -23,13 +37,20 @@ def _safe_get(d: Dict[str, Any], path: List[str], default=None):
     return cur
 
 
-def _price_level_ok(price_level: Optional[int], max_price_level: Optional[int]) -> bool:
+def _price_level_ok(
+    price_level: Optional[int],
+    max_price_level: Optional[int],
+) -> bool:
     if max_price_level is None:
         return True
     if price_level is None:
         return True
     return price_level <= max_price_level
 
+
+# =========================
+# Public API
+# =========================
 
 def search_hotels(
     city: str,
@@ -46,17 +67,26 @@ def search_hotels(
         "key": PLACES_KEY,
     }
 
-    r = requests.get(PLACES_TEXTSEARCH_URL, params=params, timeout=60)
+    r = requests.get(
+        PLACES_TEXTSEARCH_URL,
+        params=params,
+        timeout=60,
+    )
+    r.raise_for_status()
     data = r.json()
 
     status = data.get("status")
     if status not in ("OK", "ZERO_RESULTS"):
-        raise RuntimeError(f"Places TextSearch error: {status} {data.get('error_message')}")
+        raise RuntimeError(
+            f"Places TextSearch error: {status} "
+            f"{data.get('error_message')}"
+        )
 
-    results = []
+    results: List[Dict[str, Any]] = []
+
     for item in data.get("results", []):
         rating = float(item.get("rating", 0.0) or 0.0)
-        price_level = item.get("price_level", None)
+        price_level = item.get("price_level")
 
         if rating < min_rating:
             continue
@@ -74,7 +104,11 @@ def search_hotels(
             "sehir": city,
             "fiyat_gece": None,
             "puan": rating,
-            "konum_aciklama": item.get("formatted_address") or item.get("vicinity") or "",
+            "konum_aciklama": (
+                item.get("formatted_address")
+                or item.get("vicinity")
+                or ""
+            ),
             "skor": round(rating * 20, 1),
             "gerekce": "Google Places verisine göre yüksek puan / popülerlik.",
             "_lat": lat,
@@ -108,16 +142,26 @@ def search_restaurants_near_hotel(
     if cuisine:
         params["keyword"] = cuisine
 
-    r = requests.get(PLACES_NEARBY_URL, params=params, timeout=60)
+    r = requests.get(
+        PLACES_NEARBY_URL,
+        params=params,
+        timeout=60,
+    )
+    r.raise_for_status()
     data = r.json()
 
     status = data.get("status")
     if status not in ("OK", "ZERO_RESULTS"):
-        raise RuntimeError(f"Places Nearby error: {status} {data.get('error_message')}")
+        raise RuntimeError(
+            f"Places Nearby error: {status} "
+            f"{data.get('error_message')}"
+        )
 
-    out = []
+    out: List[Dict[str, Any]] = []
+
     for item in data.get("results", []):
         rating = float(item.get("rating", 0.0) or 0.0)
+
         out.append({
             "id": item.get("place_id"),
             "isim": item.get("name", ""),
@@ -127,9 +171,8 @@ def search_restaurants_near_hotel(
             "_price_level": item.get("price_level"),
             "_user_ratings_total": item.get("user_ratings_total"),
         })
+
         if len(out) >= limit:
             break
 
     return out
-
-

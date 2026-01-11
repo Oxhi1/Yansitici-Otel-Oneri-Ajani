@@ -7,7 +7,8 @@ from pathlib import Path
 
 
 # DB dosyası: app/db/app.db
-DB_PATH = Path(os.path.join("app", "db", "app.db"))
+BASE_DIR = Path(__file__).resolve().parent.parent   # app/
+DB_PATH = BASE_DIR / "db" / "app.db"
 
 
 def get_conn() -> sqlite3.Connection:
@@ -121,3 +122,42 @@ def get_recent_feedback(user_id: int, limit: int = 20) -> List[Tuple[Any, ...]]:
     rows = cur.fetchall()
     conn.close()
     return rows
+
+def init_db() -> None:
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_identifier TEXT UNIQUE NOT NULL
+        );
+    """)
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS sessions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            session_token TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+    """)
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS feedback (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            session_id INTEGER NOT NULL,
+            otel_id TEXT,
+            restoran_id TEXT,
+            rating INTEGER NOT NULL,
+            comment TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
+        );
+    """)
+
+    conn.commit()
+    conn.close()
